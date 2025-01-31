@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { fade, scale } from 'svelte/transition';
 	import { page } from '$app/state';
+	import { Capacitor } from '@capacitor/core';
+	import { Directory, Filesystem, Encoding } from '@capacitor/filesystem';
 
 	let posts = $state([]);
 	let loading = $state(false);
@@ -14,13 +16,12 @@
 	let likedPosts = $state([]);
 	let lastScrollTop = $state(0);
 	let isNavHidden = $state(false);
-    let hasReturned = $state(false)
+	let hasReturned = $state(false);
 	let inactivityTimeout;
 
 	$effect(() => {
 		if (!showDashboard && hasReturned) {
-         
-			scrollToLastPosition()
+			scrollToLastPosition();
 		}
 	});
 
@@ -60,7 +61,7 @@
 		loading = true;
 		try {
 			// Simulate loading new posts with placeholder images
-            const lastId = currentPostIndex
+			const lastId = currentPostIndex;
 			let newPosts = [];
 
 			for (let i = 0; i < 5; i++) {
@@ -88,10 +89,9 @@
 				)
 			);
 
-
 			posts = [...posts, ...newPosts];
 			Curpage += 1;
-            currentPostIndex = lastId
+			currentPostIndex = lastId;
 		} catch (error) {
 			console.error('Error loading posts:', error);
 		} finally {
@@ -114,7 +114,6 @@
 
 		if (!showDashboard) {
 			lastScrollTop = currentScroll;
-        
 		}
 		// Calculate which post is currently in view
 		const containerHeight = window.innerHeight;
@@ -136,21 +135,20 @@
 
 	function scrollToLastPosition() {
 		const posts = document.querySelectorAll('article');
-        console.log(currentPostIndex)
+		console.log(currentPostIndex);
 		if (posts[currentPostIndex]) {
 			posts[currentPostIndex].scrollIntoView({ behavior: 'instant' });
 		}
 	}
 
 	function toggleDashboard(show) {
-   
 		showDashboard = show;
-        if (!show) {
-            hasReturned = true 
-            setTimeout(() => {
-                hasReturned = false 
-            }, 100)
-        }
+		if (!show) {
+			hasReturned = true;
+			setTimeout(() => {
+				hasReturned = false;
+			}, 100);
+		}
 		// // If returning to feed, wait for render then scroll
 		// if (!show) {
 		// 	setTimeout(() => {
@@ -191,17 +189,38 @@
 	}
 
 	async function handleDownload(imageSrc) {
+		const UUID = crypto.randomUUID();
 		const image = await fetch(imageSrc);
 		const imageBlog = await image.blob();
-		const imageURL = URL.createObjectURL(imageBlog);
+		if (Capacitor.isNativePlatform()) {
 
-		const link = document.createElement('a');
-		link.href = imageURL;
-		link.download = `Daily Hentai ${imageSrc}`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
+			let base64 = await blobToBase64(imageBlog)
+
+			await Filesystem.writeFile({
+				path: `hentai/${UUID}`,
+				data: base64,
+				directory: Directory.Documents,
+				encoding: Encoding.UTF8
+			});
+		} else {
+			const imageURL = URL.createObjectURL(imageBlog);
+			const link = document.createElement('a');
+			link.href = imageURL;
+			link.download = `${UUID}`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
 	}
+	const blobToBase64 = (blob) => {
+		const reader = new FileReader();
+		reader.readAsDataURL(blob);
+		return new Promise((resolve) => {
+			reader.onloadend = () => {
+				resolve(reader.result);
+			};
+		});
+	};
 
 	onMount(() => {
 		try {
@@ -299,8 +318,6 @@
 										<line x1="12" y1="15" x2="12" y2="3" />
 									</svg>
 								</button>
-
-								
 
 								<!-- svelte-ignore a11y_no_static_element_interactions -->
 								<div

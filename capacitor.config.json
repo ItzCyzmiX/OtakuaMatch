@@ -5,5 +5,14 @@
   "bundledWebRuntime": false, 
   "CapacitorHttp": {
     "enabled": true
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "permissions": [
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE"
+    ]
   }
 }

@@ -33,8 +33,8 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
       
-    - name: Permissions
-      run: node ./permissions.cjs
+#    - name: Permissions
+#      run: node ./permissions.cjs
       
     - name: Build Android
       run: |

@@ -1,0 +1,9 @@
+{
+  "appId": "com.cyzmix.otaku",
+  "appName": "otaku-new",
+  "webDir": "build",
+  "bundledWebRuntime": false, 
+  "CapacitorHttp": {
+    "enabled": true
+  }
+}

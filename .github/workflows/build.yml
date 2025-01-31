@@ -16,11 +16,10 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
-        cache: 'npm'
+        node-version: '20'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm install
 
     - name: Build web app
       run: npm run build
@@ -33,7 +32,10 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v2
-
+      
+    - name: Permissions
+      run: node ./permissions.cjs
+      
     - name: Build Android
       run: |
         npx cap add android
